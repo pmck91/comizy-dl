@@ -1,0 +1,6 @@
+{
+  "version": {
+    "license": "MIT",
+    "approval_notes": "MIT-licensed open-source Comizy chapter downloader, submitted for unlisted self-distribution. Source archive includes release/BUILD.md with exact build instructions and release/REVIEWER_NOTES.md with permission explanations and test steps. The stable add-on ID predates the comizy-dl rename. No developer backend or telemetry. Direct page/image requests and normal Comizy-tab traffic are disclosed in PRIVACY.md. The manifest declares browsingActivity and websiteContent for those requests."
+  }
+}

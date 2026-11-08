@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>comizy-dl</title>
+  <link rel="stylesheet" href="manager.css">
+  <script defer src="manager.js"></script>
+</head>
+<body>
+  <main>
+    <header><div class="eyebrow">COMIZY DOWNLOADER</div><h1>comizy-dl</h1>
+      <p>Save chapters as page images or comic archives. Keep this tab open while downloading.</p>
+    </header>
+    <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+    <button id="grantAccess" hidden>Grant site access</button>
+    <section aria-labelledby="sourceHeading">
+      <h2 id="sourceHeading">Choose chapters</h2>
+      <form id="sourceForm">
+        <label for="sourceUrl">Comizy series or chapter URL</label>
+        <div class="inline"><input id="sourceUrl" type="url" required placeholder="https://comizy.io/series/chapter-1"><button id="loadSource" type="submit">Load source</button></div>
+      </form>
+      <div id="collection" hidden>
+        <div class="section-top"><div><h3 id="seriesTitle"></h3><p id="collectionCount" class="muted"></p></div><button id="browseSeries" hidden>Browse all chapters</button></div>
+        <div class="toolbar"><label class="grow" for="chapterSearch">Search chapters<input id="chapterSearch" type="search" placeholder="Chapter name"></label><button id="selectAll">Select all</button><button id="selectNone">Clear selection</button></div>
+        <div id="rangeControls" class="toolbar" hidden>
+          <label class="grow" for="rangeStart">From<select id="rangeStart"></select></label>
+          <label class="grow" for="rangeEnd">Through<select id="rangeEnd"></select></label>
+          <button id="selectRange">Select range</button>
+        </div>
+        <p id="selectedCount" class="muted"></p>
+        <div id="chapterList" class="chapter-list" aria-label="Available chapters"></div>
+        <div class="settings">
+          <label for="outputMode">Output<select id="outputMode"><option value="folders">Image folders</option><option value="cbz">CBZ per chapter</option></select></label>
+          <label class="grow" for="saveRoot">Subfolder in Downloads<input id="saveRoot" value="comizy-dl" required></label>
+        </div>
+        <label class="join-option"><input id="reassemblePages" type="checkbox" checked> Join split pages</label>
+        <p class="muted">Matching page pieces are joined as lossless PNGs in a separate “Reassembled” folder or archive. Standalone images keep their original format. Turn this off to save all source images separately.</p>
+        <button id="startDownload" class="primary">Download selected chapters</button>
+      </div>
+    </section>
+    <section aria-labelledby="progressHeading">
+      <div class="section-top"><h2 id="progressHeading">Downloads</h2><button id="openSource" hidden>Open source page</button></div>
+      <label for="jobHistory">Saved jobs<select id="jobHistory"><option value="">No saved jobs</option></select></label>
+      <div id="jobPanel" hidden>
+        <div class="section-top"><h3 id="jobTitle"></h3><span id="jobStatus" class="badge"></span></div>
+        <p id="jobSummary" class="muted"></p>
+        <progress id="jobProgress" value="0" max="1" aria-label="Completed chapters"></progress>
+        <p id="activity" role="status" aria-live="polite"></p>
+        <p id="jobError" class="error" hidden></p>
+        <div class="toolbar"><button id="resumeJob" class="primary">Resume / retry unfinished</button><button id="pauseJob" disabled>Pause</button><button id="cancelJob" disabled>Cancel</button></div>
+        <p class="muted">Completed files stay saved. Resuming skips files recorded complete for this job; unfinished CBZ chapters restart.</p>
+        <div class="table-wrap"><table><thead><tr><th>Chapter</th><th>Progress</th><th>Status</th></tr></thead><tbody id="taskList"></tbody></table></div>
+      </div>
+      <button id="cancelDiscovery" hidden>Cancel loading</button>
+    </section>
+    <footer>Files are saved under Firefox’s configured Downloads folder. Job history is local to this add-on installation. <a href="privacy.html" target="_blank" rel="noopener">Privacy</a></footer>
+  </main>
+</body>
+</html>
