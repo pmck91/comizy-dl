@@ -1,15 +1,18 @@
 import type { ChapterManifest, ChapterRef, Collection, Series } from './types';
 
 export const SITE = 'https://comizy.io';
+const SERIES_SECTIONS = new Set(['reviews', 'comments', 'chapters']);
 export function parseSource(input: string): { url: string; seriesUrl: string; isChapter: boolean } {
   const url = new URL(input.trim());
   const parts = url.pathname.split('/').filter(Boolean);
   if (url.origin !== SITE || url.username || url.password ||
       parts.length < 1 || parts.length > 2 ||
       !parts.every(p => /^[a-zA-Z0-9_-]+$/.test(p)) ||
-      (parts.length === 2 && !parts[1].startsWith('chapter-'))) {
+      (parts.length === 2 && SERIES_SECTIONS.has(parts[1].toLowerCase()))) {
     throw new Error('Enter a Comizy series or chapter URL.');
   }
+  // Reader slugs include volume chapters, bonuses, and oneshots. Their metadata
+  // is validated by extractChapter; a chapter- prefix is not required by Comizy.
   return { url: `${SITE}/${parts.join('/')}`, seriesUrl: `${SITE}/${parts[0]}`, isChapter: parts.length === 2 };
 }
 

@@ -2,6 +2,10 @@
 
 The project is **MIT-licensed open source**. Its prepared Mozilla distribution channel is **unlisted**: Mozilla signs the extension for personal/self-distributed installation, without a public AMO store listing. Standard Firefox requires the signed XPI. Local ZIPs are unsigned development/submission packages.
 
+## Changes in 0.4.1
+
+Chapter discovery now runs in the manager tab, so Firefox can suspend its background event page without dropping an in-flight scan. Collector connections recover from document reloads, cancellation closes owned helper tabs, and real extraction errors remain visible. Explicit site range controls can define complete coverage when a headline count is stale; Nights With a Cat lists 258 available entries in ranges 4–261 while its counter says 261, and the manager displays both counts. Partial initial lists are still rejected.
+
 ## Prepare the release
 
 Use Node.js 26.13.0 (see `.nvmrc`) and npm 12.2.1 for the recorded build environment.
@@ -11,11 +15,11 @@ npm ci
 npm run release
 ```
 
-The command runs type checking, tests, the build, and Mozilla add-on lint. It produces these files for version 0.3.1:
+The command runs type checking, tests, the build, and Mozilla add-on lint. It produces these files for version 0.4.1:
 
-- `artifacts/comizy-dl-0.3.1.zip`: unsigned extension to submit to Mozilla.
-- `artifacts/comizy-dl-0.3.1-sources.zip`: matching reviewer sources and reproducible build instructions.
-- `artifacts/SHA256SUMS-0.3.1.txt`: hashes of those two archives.
+- `artifacts/comizy-dl-0.4.1.zip`: unsigned extension to submit to Mozilla.
+- `artifacts/comizy-dl-0.4.1-sources.zip`: matching reviewer sources and reproducible build instructions.
+- `artifacts/SHA256SUMS-0.4.1.txt`: hashes of those two archives.
 
 `npm run package:source` creates only the source archive. That archive uses an allowlist of source/build/doc/test files, excludes dependencies, generated artifacts, hidden credential files and downloaded manga, and refuses symlinked source files.
 

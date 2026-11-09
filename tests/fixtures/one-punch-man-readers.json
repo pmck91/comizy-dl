@@ -1,0 +1,308 @@
+[
+  {
+    "source": "https://comizy.io/one-punch-man/vol-15-chapter-76-stagnation-and-gro",
+    "pageProps": {
+      "initialManga": {
+        "slug": "one-punch-man",
+        "name": "One Punch Man",
+        "stats": {
+          "day_views": 0,
+          "week_views": 0,
+          "month_views": 0,
+          "chapters_count": 503
+        }
+      },
+      "initialChapter": {
+        "url": "/one-punch-man/vol-15-chapter-76-stagnation-and-gro",
+        "name": "Vol.15 : chapter 76: stagnation and gro...",
+        "number": 220,
+        "images": [
+          "https://x6.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhlTV1MGUlZXAwRRVwY.webp",
+          "https://x7.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhkCU1YBVwNTVgAAAlM.webp",
+          "https://x8.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhkDUgRWBlFcDQcCUFI.webp",
+          "https://x9.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhkEUgEHAVBQBFwFVlc.webp",
+          "https://x10.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhlWA1RTBldUBAAEUVI.webp",
+          "https://x1.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhkHVVYLAFAGBgYBVVc.webp",
+          "https://x2.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhlUAFRTUwJSBl1RUVA.webp",
+          "https://x3.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhkDB1MEAQpTUgAAU1c.webp",
+          "https://x4.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhlXVVcKUgtWAFFQUAA.webp",
+          "https://x5.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhkEBwYFVFUGDFEGUAU.webp",
+          "https://x6.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhkEBFRUBlJQVwNWAAY.webp",
+          "https://x7.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhlVAVoCAgpQAANRVQc.webp",
+          "https://x8.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhlQCQMEAAABAFcNXgA.webp",
+          "https://x9.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhkAA1UAUQtRVlJTUwQ.webp",
+          "https://x10.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhlQAVMAUAIBBQEMXwc.webp",
+          "https://x1.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhkDVFcKWgEFUV1UBAM.webp",
+          "https://x2.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhlYV1QBWwRXBwMAB1c.webp",
+          "https://x3.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhlVCAcKBwcGAwBUAg4.webp"
+        ],
+        "pages": [
+          {
+            "url": "https://x6.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhlTV1MGUlZXAwRRVwY.webp",
+            "width": 700,
+            "height": 1100
+          },
+          {
+            "url": "https://x7.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhkCU1YBVwNTVgAAAlM.webp",
+            "width": 700,
+            "height": 700
+          },
+          {
+            "url": "https://x8.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhkDUgRWBlFcDQcCUFI.webp",
+            "width": 700,
+            "height": 1100
+          },
+          {
+            "url": "https://x9.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhkEUgEHAVBQBFwFVlc.webp",
+            "width": 700,
+            "height": 1100
+          },
+          {
+            "url": "https://x10.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhlWA1RTBldUBAAEUVI.webp",
+            "width": 700,
+            "height": 1100
+          },
+          {
+            "url": "https://x1.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhkHVVYLAFAGBgYBVVc.webp",
+            "width": 700,
+            "height": 1100
+          },
+          {
+            "url": "https://x2.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhlUAFRTUwJSBl1RUVA.webp",
+            "width": 700,
+            "height": 1100
+          },
+          {
+            "url": "https://x3.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhkDB1MEAQpTUgAAU1c.webp",
+            "width": 700,
+            "height": 1100
+          },
+          {
+            "url": "https://x4.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhlXVVcKUgtWAFFQUAA.webp",
+            "width": 700,
+            "height": 1100
+          },
+          {
+            "url": "https://x5.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhkEBwYFVFUGDFEGUAU.webp",
+            "width": 700,
+            "height": 1100
+          },
+          {
+            "url": "https://x6.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhkEBFRUBlJQVwNWAAY.webp",
+            "width": 700,
+            "height": 1100
+          },
+          {
+            "url": "https://x7.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhlVAVoCAgpQAANRVQc.webp",
+            "width": 700,
+            "height": 1100
+          },
+          {
+            "url": "https://x8.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhlQCQMEAAABAFcNXgA.webp",
+            "width": 700,
+            "height": 1100
+          },
+          {
+            "url": "https://x9.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhkAA1UAUQtRVlJTUwQ.webp",
+            "width": 700,
+            "height": 1100
+          },
+          {
+            "url": "https://x10.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhlQAVMAUAIBBQEMXwc.webp",
+            "width": 700,
+            "height": 1100
+          },
+          {
+            "url": "https://x1.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhkDVFcKWgEFUV1UBAM.webp",
+            "width": 700,
+            "height": 1100
+          },
+          {
+            "url": "https://x2.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhlYV1QBWwRXBwMAB1c.webp",
+            "width": 700,
+            "height": 1100
+          },
+          {
+            "url": "https://x3.cmzcdn.org/e/E0BbC1sUVwICBk0FAV5XBFYMUhlVCAcKBwcGAwBUAg4.webp",
+            "width": 700,
+            "height": 1100
+          }
+        ]
+      }
+    }
+  },
+  {
+    "source": "https://comizy.io/one-punch-man/oneshot-young-jump-special-6",
+    "pageProps": {
+      "initialManga": {
+        "slug": "one-punch-man",
+        "name": "One Punch Man",
+        "stats": {
+          "day_views": 0,
+          "week_views": 0,
+          "month_views": 0,
+          "chapters_count": 503
+        }
+      },
+      "initialChapter": {
+        "url": "/one-punch-man/oneshot-young-jump-special-6",
+        "name": "Oneshot: Young Jump Special 6",
+        "number": 263,
+        "images": [
+          "https://x4.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRlXCQAGAFIFVgFUBQE.webp",
+          "https://x5.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRlYAVEGAQUFV1dUVwM.webp",
+          "https://x6.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRkAUlEBUgddAFYMUAU.webp",
+          "https://x7.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRkDVVRRBQJVBlENXwU.webp",
+          "https://x8.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRlYVAcAUlZSUAYNBVQ.webp",
+          "https://x9.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRkEV1ADB1ACDFwAVVc.webp",
+          "https://x10.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRkABVpQVFYCBlQDBFQ.webp",
+          "https://x1.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRkCV1YEUFFSUVRXVwc.webp",
+          "https://x2.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRlSAVBQAQoABV1TVQ8.webp",
+          "https://x3.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRlTA1cFAQZWAwQCVQE.webp",
+          "https://x4.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRlWBwBQUQsGDAcMVwU.webp",
+          "https://x5.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRkCUlRWAQBSBQENVgE.webp",
+          "https://x6.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRlYV1cABVAADV1TBAE.webp",
+          "https://x7.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRlRUwZUU1ZTVQNRXwA.webp",
+          "https://x8.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRlTAlRRUgFVBgYEUVU.webp",
+          "https://x9.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRlUU1QEUwEBV1NXUFc.webp",
+          "https://x10.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRlZAVsLWlJcAQNTBQY.webp"
+        ],
+        "pages": [
+          {
+            "url": "https://x4.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRlXCQAGAFIFVgFUBQE.webp",
+            "width": 876,
+            "height": 1300
+          },
+          {
+            "url": "https://x5.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRlYAVEGAQUFV1dUVwM.webp",
+            "width": 800,
+            "height": 800
+          },
+          {
+            "url": "https://x6.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRkAUlEBUgddAFYMUAU.webp",
+            "width": 900,
+            "height": 1300
+          },
+          {
+            "url": "https://x7.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRkDVVRRBQJVBlENXwU.webp",
+            "width": 899,
+            "height": 1300
+          },
+          {
+            "url": "https://x8.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRlYVAcAUlZSUAYNBVQ.webp",
+            "width": 900,
+            "height": 1300
+          },
+          {
+            "url": "https://x9.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRkEV1ADB1ACDFwAVVc.webp",
+            "width": 900,
+            "height": 1300
+          },
+          {
+            "url": "https://x10.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRkABVpQVFYCBlQDBFQ.webp",
+            "width": 900,
+            "height": 1300
+          },
+          {
+            "url": "https://x1.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRkCV1YEUFFSUVRXVwc.webp",
+            "width": 900,
+            "height": 1300
+          },
+          {
+            "url": "https://x2.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRlSAVBQAQoABV1TVQ8.webp",
+            "width": 900,
+            "height": 1300
+          },
+          {
+            "url": "https://x3.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRlTA1cFAQZWAwQCVQE.webp",
+            "width": 900,
+            "height": 1300
+          },
+          {
+            "url": "https://x4.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRlWBwBQUQsGDAcMVwU.webp",
+            "width": 900,
+            "height": 1300
+          },
+          {
+            "url": "https://x5.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRkCUlRWAQBSBQENVgE.webp",
+            "width": 900,
+            "height": 1300
+          },
+          {
+            "url": "https://x6.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRlYV1cABVAADV1TBAE.webp",
+            "width": 900,
+            "height": 1300
+          },
+          {
+            "url": "https://x7.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRlRUwZUU1ZTVQNRXwA.webp",
+            "width": 900,
+            "height": 1300
+          },
+          {
+            "url": "https://x8.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRlTAlRRUgFVBgYEUVU.webp",
+            "width": 900,
+            "height": 1300
+          },
+          {
+            "url": "https://x9.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRlUU1QEUwEBV1NXUFc.webp",
+            "width": 900,
+            "height": 1300
+          },
+          {
+            "url": "https://x10.cmzcdn.org/e/E0BbC1sUVwICBk0HAVlXVlRTVRlZAVsLWlJcAQNTBQY.webp",
+            "width": 900,
+            "height": 1300
+          }
+        ]
+      }
+    }
+  },
+  {
+    "source": "https://comizy.io/one-punch-man/bonus-chapter",
+    "pageProps": {
+      "initialManga": {
+        "slug": "one-punch-man",
+        "name": "One Punch Man",
+        "stats": {
+          "day_views": 0,
+          "week_views": 0,
+          "month_views": 0,
+          "chapters_count": 503
+        }
+      },
+      "initialChapter": {
+        "url": "/one-punch-man/bonus-chapter",
+        "name": "Bonus Chapter",
+        "number": 458,
+        "images": [
+          "https://x1.cmzcdn.org/e/E0BbC1sUVwICBk0DAFoGDQYNUBkDBlMFW1FUVgFTVQ4.webp",
+          "https://x2.cmzcdn.org/e/E0BbC1sUVwICBk0DAFoGDQYNUBlVB1MHAlIAAgNRBVI.webp",
+          "https://x3.cmzcdn.org/e/E0BbC1sUVwICBk0DAFoGDQYNUBlWU1dRVQRQVwQHXwc.webp",
+          "https://x4.cmzcdn.org/e/E0BbC1sUVwICBk0DAFoGDQYNUBlRVVBXUgRdB1QMAlU.webp"
+        ],
+        "pages": [
+          {
+            "url": "https://x1.cmzcdn.org/e/E0BbC1sUVwICBk0DAFoGDQYNUBkDBlMFW1FUVgFTVQ4.webp",
+            "width": 640,
+            "height": 1040
+          },
+          {
+            "url": "https://x2.cmzcdn.org/e/E0BbC1sUVwICBk0DAFoGDQYNUBlVB1MHAlIAAgNRBVI.webp",
+            "width": 640,
+            "height": 1054
+          },
+          {
+            "url": "https://x3.cmzcdn.org/e/E0BbC1sUVwICBk0DAFoGDQYNUBlWU1dRVQRQVwQHXwc.webp",
+            "width": 580,
+            "height": 925
+          },
+          {
+            "url": "https://x4.cmzcdn.org/e/E0BbC1sUVwICBk0DAFoGDQYNUBlRVVBXUgRdB1QMAlU.webp",
+            "width": 1200,
+            "height": 902
+          }
+        ]
+      }
+    }
+  }
+]

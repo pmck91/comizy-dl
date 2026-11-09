@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "comizy-dl",
-  "version": "0.3.1",
+  "version": "0.4.1",
   "description": "Download selected Comizy chapters as page images or CBZ archives.",
   "browser_specific_settings": {
     "gecko": {

@@ -22,6 +22,30 @@ describe('Comizy page extraction', () => {
     expect(manifest.pages[1].index).toBe(1);
     expect(manifest.pages[1]).toMatchObject({ width: 1056, height: 84 });
   });
+  it('accepts volume, bonus, oneshot, and other safe reader slugs', () => {
+    for (const slug of ['vol-15-chapter-76-stagnation-and-gro', 'oneshot-young-jump-special-6', 'bonus-chapter', 'bounus-187-5', 'special-epilogue']) {
+      const url = `https://comizy.io/one-punch-man/${slug}`;
+      expect(parseSource(url)).toEqual({ url, seriesUrl: 'https://comizy.io/one-punch-man', isChapter: true });
+    }
+    for (const slug of ['reviews', 'comments', 'chapters', 'REVIEWS']) {
+      expect(() => parseSource(`https://comizy.io/one-punch-man/${slug}`)).toThrow();
+    }
+  });
+  it('extracts the complete image metadata from real nonstandard One Punch Man readers', () => {
+    const readers = JSON.parse(readFileSync(new URL('./fixtures/one-punch-man-readers.json', import.meta.url), 'utf8')) as
+      { source: string; pageProps: { initialChapter: { number: number; pages: unknown[] } } }[];
+    expect(readers).toHaveLength(3);
+    for (const reader of readers) {
+      const doc = new JSDOM('<script id="__NEXT_DATA__" type="application/json"></script>').window.document;
+      doc.querySelector('#__NEXT_DATA__')!.textContent = JSON.stringify({ props: { pageProps: reader.pageProps } });
+      const result = extractChapter(doc, reader.source);
+      expect(result.chapter.url).toBe(reader.source);
+      expect(result.chapter.order).toBe(reader.pageProps.initialChapter.number);
+      expect(result.pages).toHaveLength(reader.pageProps.initialChapter.pages.length);
+      expect(result.pages.length).toBeGreaterThan(0);
+      expect(() => extractChapter(doc, 'https://comizy.io/one-punch-man/wrong-reader')).toThrow(/different chapter/);
+    }
+  });
   it('keeps repeated image URLs as distinct numbered pages', () => {
     const doc = fixture('chapter-1');
     const props = pageProps(doc);

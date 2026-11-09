@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
-import { composePage } from '../src/compose';
+import { composePage, measureImage } from '../src/compose';
 
 const file = { bytes: new Uint8Array([1, 2]), extension: 'webp', mime: 'image/webp' };
 const parts = [
@@ -49,4 +49,16 @@ it('reports an encoding failure and honors cancellation during encoding', async 
   const controller = new AbortController();
   canvas.toBlob.mockImplementation(callback => { controller.abort(); callback(new Blob()); });
   await expect(composePage(parts, controller.signal)).rejects.toMatchObject({ name: 'AbortError' });
+});
+
+it('measures actual decoded dimensions and releases the bitmap', async () => {
+  expect(await measureImage(file, new AbortController().signal)).toEqual({ width: 1056, height: 1500 });
+  expect(top.close).toHaveBeenCalledOnce();
+  expect(document.createElement).not.toHaveBeenCalled();
+});
+it('releases the measurement bitmap when cancellation occurs during decoding', async () => {
+  const controller = new AbortController();
+  vi.mocked(createImageBitmap).mockReset().mockImplementation(async () => { controller.abort(); return top as ImageBitmap; });
+  await expect(measureImage(file, controller.signal)).rejects.toMatchObject({ name: 'AbortError' });
+  expect(top.close).toHaveBeenCalledOnce();
 });

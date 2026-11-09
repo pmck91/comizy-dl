@@ -33,9 +33,9 @@ vi.mock('../src/network', async importOriginal => {
 });
 vi.mock('../src/compose', async importOriginal => {
   const actual = await importOriginal<typeof import('../src/compose')>();
-  return { ...actual, composePage: vi.fn(actual.composePage) };
+  return { ...actual, composePage: vi.fn(actual.composePage), measureImage: vi.fn(actual.measureImage) };
 });
-import { composePage } from '../src/compose';
+import { composePage, measureImage } from '../src/compose';
 import { loadChapter, loadImage } from '../src/network';
 import { runJob, waitForDownload } from '../src/runner';
 
@@ -47,6 +47,7 @@ beforeEach(() => {
     series: { title: 'Series', slug: 'series', url: 'https://comizy.io/series', chapterCount: 1 },
     tasks: [{ chapter: { label: 'Chapter 1', url: 'https://comizy.io/series/chapter-1', order: 1 }, status: 'queued', files: {} }],
   };
+  vi.mocked(measureImage).mockResolvedValue({ width: 1056, height: 792 });
   listeners = new Set();
   vi.stubGlobal('browser', { downloads: {
     onChanged: { addListener: (listener: typeof listeners extends Set<infer T> ? T : never) => listeners.add(listener), removeListener: (listener: typeof listeners extends Set<infer T> ? T : never) => listeners.delete(listener) },
@@ -105,8 +106,8 @@ describe('chapter download orchestration', () => {
     expect(entries['001.webp']).toEqual(new Uint8Array([9, 8, 7]));
     expect(state.job!.status).toBe('failed');
   });
-  it('aborts unfinished archive work and refetches the chapter when resumed', async () => {
-    state.job!.mode = 'cbz';
+  it('aborts unfinished archive analysis and refetches the chapter when resumed', async () => {
+    state.job!.mode = 'cbz'; state.job!.reassemble = true;
     let started!: () => void; const ready = new Promise<void>(resolve => { started = resolve; });
     vi.mocked(loadImage).mockImplementation(async (_url, signal) => {
       started();
@@ -125,6 +126,8 @@ describe('chapter download orchestration', () => {
   });
   it('resumes assembled folder output by logical page, skipping both chunks of completed pages', async () => {
     state.job!.reassemble = true;
+    state.job!.tasks[0].layout = { version: 1, groups: [2, 1, 2], joinedPages: 2, ambiguousPairs: 0,
+      sources: [1500, 84, 792, 1500, 84].map((height, index) => ({ index, width: 1056, height, url: `https://x1.cmzcdn.org/${index}.webp` })) };
     state.job!.tasks[0].pageCount = 3;
     state.job!.tasks[0].files['0'] = { downloadId: 1, filename: '001.png', state: 'complete' };
     vi.mocked(loadChapter).mockImplementation(async () => ({
@@ -132,7 +135,7 @@ describe('chapter download orchestration', () => {
       pages: [1500, 84, 792, 1500, 84].map((height, index) => ({ index, width: 1056, height, url: `https://x1.cmzcdn.org/${index}.webp` })),
     }));
     await runJob('job', 7, new AbortController().signal, () => {});
-    expect(loadImage).toHaveBeenCalledTimes(3);
+    expect(loadImage).toHaveBeenCalledTimes(3); expect(measureImage).not.toHaveBeenCalled();
     expect(vi.mocked(loadImage).mock.calls.map(c => c[0]).sort()).toEqual([2, 3, 4].map(i => `https://x1.cmzcdn.org/${i}.webp`));
     expect(state.payloads.map(p => p.filename).sort()).toEqual([
       'comizy-dl/series/0001 - Chapter 1 - Reassembled/002.webp',
@@ -144,9 +147,10 @@ describe('chapter download orchestration', () => {
     state.job!.mode = 'cbz'; state.job!.reassemble = true;
     vi.mocked(loadChapter).mockImplementation(async () => ({
       series: state.job!.series, chapter: state.job!.tasks[0].chapter,
-      pages: [1500, 84, 792, 1500, 84].map((height, index) => ({ index, width: 1056, height, url: `https://x1.cmzcdn.org/${index}.webp` })),
+      pages: [1500, 100, 792, 844, 56].map((height, index) => ({ index, width: index >= 3 ? 1200 : 1067, height, url: `https://x1.cmzcdn.org/${index}.webp` })),
     }));
     vi.mocked(loadImage).mockImplementation(async url => ({ bytes: new Uint8Array([Number(url.match(/\/(\d+)\.webp$/)![1])]), extension: 'webp', mime: 'image/webp' }));
+    vi.mocked(measureImage).mockImplementation(async image => { const index = image.bytes[0]; return { width: index >= 3 ? 1200 : 1067, height: [1500, 100, 792, 844, 56][index] }; });
     await runJob('job', 7, new AbortController().signal, () => {});
     expect(state.payloads).toHaveLength(1);
     expect(state.payloads[0].filename).toBe('comizy-dl/series/0001 - Chapter 1 - Reassembled.cbz');
@@ -157,6 +161,45 @@ describe('chapter download orchestration', () => {
     expect(entries['003.png']).toEqual(new Uint8Array([137, 3, 4]));
     expect(state.job!.tasks[0].pageCount).toBe(3); expect(state.job!.status).toBe('complete');
   });
+  it('measures the whole chapter before saving, ignores inaccurate metadata, and learns unfamiliar sizes', async () => {
+    state.job!.reassemble = true;
+    const heights = [1303, 91, 1303, 91, 792];
+    vi.mocked(loadChapter).mockImplementation(async () => ({ series: state.job!.series, chapter: state.job!.tasks[0].chapter,
+      pages: heights.map((_, index) => ({ index, width: 10, height: 10, url: `https://x1.cmzcdn.org/${index}.webp` })) }));
+    let active = 0, peak = 0;
+    vi.mocked(loadImage).mockImplementation(async url => {
+      active++; peak = Math.max(peak, active);
+      await new Promise(resolve => setTimeout(resolve, 1)); active--;
+      return { bytes: new Uint8Array([Number(url.match(/\/(\d+)\.webp$/)![1])]), extension: 'webp', mime: 'image/webp' };
+    });
+    vi.mocked(measureImage).mockImplementation(async image => ({ width: 1000, height: heights[image.bytes[0]] }));
+    vi.mocked(composePage).mockImplementation(async parts => {
+      expect(measureImage).toHaveBeenCalledTimes(5);
+      expect(state.job!.tasks[0].layout?.groups).toEqual([2, 2, 1]);
+      return parts[0].image;
+    });
+    await runJob('job', 7, new AbortController().signal, () => {});
+    expect(peak).toBe(3); expect(loadImage).toHaveBeenCalledTimes(5);
+    expect(state.job!.tasks[0].layout?.sources.map(source => source.height)).toEqual(heights);
+    expect(state.job!.tasks[0].pageCount).toBe(3); expect(state.payloads).toHaveLength(3);
+    expect(state.job!.status).toBe('complete');
+  });
+  it('leaves an unfinished legacy reassembled chapter untouched until a new job is created', async () => {
+    state.job!.reassemble = true;
+    state.job!.tasks[0].files['0'] = { downloadId: 1, filename: '001.png', state: 'complete' };
+    await runJob('job', 7, new AbortController().signal, () => {});
+    expect(loadImage).not.toHaveBeenCalled(); expect(state.payloads).toHaveLength(0);
+    expect(state.job!.tasks[0].error).toMatch(/Create a new job/);
+    expect(state.job!.tasks[0].files['0'].state).toBe('complete');
+  });
+  it('writes no pages if any source image fails before analysis finishes', async () => {
+    state.job!.reassemble = true;
+    vi.mocked(loadImage).mockRejectedValueOnce(new Error('Broken source image'));
+    await runJob('job', 7, new AbortController().signal, () => {});
+    expect(state.payloads).toHaveLength(0); expect(state.job!.tasks[0].layout).toBeUndefined();
+    expect(state.job!.tasks[0].error).toBe('Broken source image');
+  });
+
 });
 
 it('handles interrupted browser file saves and removes its event listener', async () => {

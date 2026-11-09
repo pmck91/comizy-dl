@@ -59,6 +59,12 @@ async function createRunning(): Promise<DownloadJob> {
 }
 
 describe('Firefox background lifecycle', () => {
+  it('opens and registers a helper immediately without holding a collection response open', async () => {
+    expect(await send({ type: 'OPEN_DISCOVERY', url: 'https://comizy.io/nights-with-a-cat', ownerTabId: 9 })).toEqual({ ok: true, value: 22 });
+    expect(session.values['helper:22']).toBe(9);
+    expect(tabs.sendMessage).not.toHaveBeenCalled();
+  });
+
   it('recovers an active persisted job after restart without losing preferences or completed files', async () => {
     const job = await createRunning();
     local.values.preferences = { root: 'My Comics', mode: 'folders', reassemble: true };
@@ -120,15 +126,16 @@ describe('Firefox background lifecycle', () => {
     expect(session.values['helper:22']).toBeUndefined();
     expect(session.values.managerTabId).toBeUndefined();
   });
-  it('cancels discovery even when cancellation arrives before tabs.create resolves', async () => {
+  it('serializes cancellation behind tab creation and removes the newly created helper', async () => {
     let release!: (value: { id: number }) => void;
     tabs.create.mockImplementation(() => new Promise(resolve => { release = resolve; }));
-    const discovery = send({ type: 'DISCOVER', url: 'https://comizy.io/series', ownerTabId: 9 });
+    const discovery = send({ type: 'OPEN_DISCOVERY', url: 'https://comizy.io/series', ownerTabId: 9 });
     await vi.waitFor(() => expect(tabs.create).toHaveBeenCalled());
-    await send({ type: 'CANCEL_DISCOVERY', ownerTabId: 9 });
+    const cancellation = send({ type: 'CANCEL_DISCOVERY', ownerTabId: 9 });
     release({ id: 22 });
     const reply = await discovery;
-    expect(reply.ok).toBe(false);
+    await cancellation;
+    expect(reply).toEqual({ ok: true, value: 22 });
     expect(tabs.remove).toHaveBeenCalledWith(22);
     expect(tabs.sendMessage).not.toHaveBeenCalled();
     expect(session.values['helper:22']).toBeUndefined();

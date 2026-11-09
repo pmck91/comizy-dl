@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { constants, copyFileSync, mkdirSync, readFileSync, readdirSync, realpathSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { resolve, join } from 'node:path';
-import { planPages } from '../src/pages.ts';
+import { analyzePages } from '../src/pages.ts';
 
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
@@ -27,13 +27,14 @@ const images = names.map((name, index) => {
   const [width, height] = dimensions.split(' ').map(Number);
   return { index, url: name, width, height };
 });
-const pages = planPages(images, true);
+const analysis = analyzePages(images);
+const pages = analysis.pages;
 const mapping = pages.map(page => ({
   output: `${String(page.index + 1).padStart(Math.max(3, String(pages.length).length), '0')}.${page.parts.length === 2 ? 'png' : page.parts[0].url.split('.').at(-1)}`,
   width: page.parts[0].width, height: page.parts.reduce((sum, part) => sum + part.height, 0),
   sources: page.parts.map(part => ({ filename: part.url, sha256: sha256(readFileSync(join(input, part.url))) })),
 }));
-const summary = { source: input, destination: output, sourceImages: images.length, outputPages: pages.length, joinedPages: pages.filter(p => p.parts.length === 2).length };
+const summary = { source: input, destination: output, sourceImages: images.length, outputPages: pages.length, joinedPages: analysis.joinedPages, ambiguousPairs: analysis.ambiguousPairs };
 if (!dryRun) {
   // Refuse an existing destination. Every write below targets this newly created folder.
   mkdirSync(output);

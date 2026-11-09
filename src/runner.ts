@@ -1,8 +1,9 @@
 import { request, errorText } from './api';
 import { makeCbz } from './archive';
 import { AccessError, loadChapter, loadImage } from './network';
-import { composePage } from './compose';
-import { planPages } from './pages';
+import { composePage, type ImageDataFile } from './compose';
+import { preparePages } from './prepare';
+import { planPages, restorePages, type OutputPage } from './pages';
 import { chapterBase, pageFilename } from './paths';
 import type { ChapterTask, DownloadJob } from './types';
 
@@ -51,7 +52,18 @@ export async function runJob(
       onMessage(`Reading ${task.chapter.label}…`);
       await request({ type: 'PATCH_CHAPTER', id, chapterUrl: task.chapter.url, patch: { status: 'downloading', error: undefined } });
       const manifest = await loadChapter(task.chapter.url, signal, onMessage);
-      const pages = planPages(manifest.pages, job.reassemble ?? false);
+      let pages: OutputPage[];
+      let originals = new Map<number, ImageDataFile>();
+      if (job.reassemble) {
+        if (task.layout) pages = restorePages(task.layout, manifest.pages);
+        else {
+          if (Object.keys(task.files).length) throw new Error('This unfinished chapter predates automatic page analysis. Create a new job to keep its page numbering consistent.');
+          const prepared = await preparePages(manifest.pages, signal, onMessage);
+          pages = prepared.pages; originals = prepared.files; task.layout = prepared.layout;
+          // Persist before any save: resumes reuse this exact layout and skip completed pages.
+          await request({ type: 'PATCH_CHAPTER', id, chapterUrl: task.chapter.url, patch: { layout: task.layout } });
+        }
+      } else pages = planPages(manifest.pages, false);
       if (task.pageCount !== undefined && task.pageCount !== pages.length && Object.keys(task.files).length) {
         throw new Error('The chapter page count changed. Create a new job to download the revised chapter.');
       }
@@ -76,10 +88,11 @@ export async function runJob(
               // Each worker fetches one part at a time, retaining the three-request limit.
               const parts = [];
               for (const source of pages[index].parts) {
-                const image = await loadImage(source.url, chapterAbort.signal, onMessage);
+                const image = originals.get(source.index) ?? await loadImage(source.url, chapterAbort.signal, onMessage);
                 parts.push({ source, image });
               }
               const image = await composePage(parts, chapterAbort.signal);
+              for (const source of pages[index].parts) originals.delete(source.index);
               chapterAbort.signal.throwIfAborted();
               const filename = pageFilename(index, task.pageCount!, image.extension);
               if (job.mode === 'folders') await saveBlob(job, task, new Blob([image.bytes.buffer], { type: image.mime }), `${base}/${filename}`, index);

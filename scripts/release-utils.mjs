@@ -11,7 +11,7 @@ const topLevelFiles = ['package.json', 'package-lock.json', 'tsconfig.json', 'RE
 const sourceGroups = {
   src: new Set(['.ts']), scripts: new Set(['.mjs']),
   public: new Set(['.json', '.html', '.css', '.svg']),
-  tests: new Set(['.ts', '.mjs', '.html']), release: new Set(['.json', '.md']),
+  tests: new Set(['.ts', '.mjs', '.html', '.json']), release: new Set(['.json', '.md']),
 };
 
 export async function releaseInfo(root = projectRoot) {

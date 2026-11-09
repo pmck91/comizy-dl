@@ -1,6 +1,7 @@
 import { request, errorText } from './api';
 import { parseSource } from './comizy';
 import { loadChapter } from './network';
+import { discoverSeries } from './discovery';
 import { normalizeRoot } from './paths';
 import { runJob } from './runner';
 import { JOB_PREFIX, type Collection, type DownloadJob, type OutputMode } from './types';
@@ -59,7 +60,7 @@ function showCollection(value: Collection, full: boolean) {
   collection = value; fullSeries = full; selected = new Set(full ? [] : value.chapters.map(c => c.url));
   el('collection').hidden = false;
   el('seriesTitle').textContent = value.series.title;
-  el('collectionCount').textContent = full ? `${value.chapters.length} chapters available` : `Current chapter · ${value.series.chapterCount} chapters in this series`;
+  el('collectionCount').textContent = full ? `${value.chapters.length} chapters available${value.series.advertisedChapterCount ? ` · Comizy counter: ${value.series.advertisedChapterCount}` : ''}` : `Current chapter · ${value.series.chapterCount} chapters in this series`;
   el('browseSeries').hidden = full;
   el('rangeControls').hidden = !full;
   input('chapterSearch').value = '';
@@ -81,7 +82,7 @@ async function loadSource(forceSeries = false) {
       controller.signal.throwIfAborted();
       showCollection({ series: manifest.series, chapters: [manifest.chapter] }, false);
     } else {
-      const result = await request<Collection>({ type: 'DISCOVER', url: parsed.seriesUrl, ownerTabId: tabId });
+      const result = await discoverSeries(parsed.seriesUrl, tabId, controller.signal);
       controller.signal.throwIfAborted();
       showCollection(result, true);
     }
@@ -99,7 +100,7 @@ function renderJob() {
   const done = job.tasks.filter(t => t.status === 'complete').length;
   el('jobTitle').textContent = job.series.title;
   el('jobStatus').textContent = job.status;
-  el('jobSummary').textContent = `${done} of ${job.tasks.length} chapters complete · ${job.mode === 'cbz' ? 'CBZ archives' : 'Image folders'} · ${job.reassemble ? 'Split pages joined' : 'Original source images'} · Downloads/${job.root}`;
+  el('jobSummary').textContent = `${done} of ${job.tasks.length} chapters complete · ${job.mode === 'cbz' ? 'CBZ archives' : 'Image folders'} · ${job.reassemble ? 'Automatic page joining' : 'Original source images'} · Downloads/${job.root}`;
   el<HTMLProgressElement>('jobProgress').max = job.tasks.length;
   el<HTMLProgressElement>('jobProgress').value = done;
   el('jobError').textContent = job.error ?? ''; el('jobError').hidden = !job.error;
@@ -112,6 +113,7 @@ function renderJob() {
     const progress = document.createElement('td');
     const files = Object.values(task.files).filter(f => f.state === 'complete').length;
     progress.textContent = job.mode === 'folders' ? `${files} / ${task.pageCount ?? '—'} images` : task.archive?.state === 'complete' ? 'Archive saved' : task.pageCount ? `${task.pageCount} images` : '—';
+    if (task.layout) progress.textContent += ` · ${task.layout.joinedPages} joined${task.layout.ambiguousPairs ? ` · ${task.layout.ambiguousPairs} possible joins left separate` : ''}`;
     const status = document.createElement('td'); status.textContent = task.status;
     if (task.error) { const error = document.createElement('small'); error.textContent = task.error; status.append(error); }
     row.append(chapter, progress, status); table.append(row);

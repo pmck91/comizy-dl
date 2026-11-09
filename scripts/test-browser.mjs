@@ -10,6 +10,7 @@ const bundle = await build({
   stdin: {
     resolveDir: process.cwd(), sourcefile: 'canvas-test.ts', loader: 'ts', contents: `
       import { composePage } from './src/compose';
+      import { preparePages } from './src/prepare';
       async function source(height, color) {
         const canvas = document.createElement('canvas'); canvas.width = 2; canvas.height = height;
         const ctx = canvas.getContext('2d'); ctx.fillStyle = color; ctx.fillRect(0, 0, 2, height);
@@ -19,20 +20,46 @@ const bundle = await build({
       function check(value, message) { if (!value) throw new Error(message); }
       (async () => {
         try {
-          const head = await source(1500, '#ff0000'), tail = await source(84, '#0000ff');
-          const parts = [
-            { source: { index: 0, url: '', width: 2, height: 1500 }, image: head },
-            { source: { index: 1, url: '', width: 2, height: 84 }, image: tail },
-          ];
-          const result = await composePage(parts, new AbortController().signal);
-          check(result.extension === 'png' && result.mime === 'image/png', 'Joined output must be PNG');
-          const image = await createImageBitmap(new Blob([result.bytes], { type: result.mime }));
-          check(image.width === 2 && image.height === 1584, 'Joined output dimensions');
-          const canvas = document.createElement('canvas'); canvas.width = 2; canvas.height = 1584;
-          const ctx = canvas.getContext('2d'); ctx.drawImage(image, 0, 0); image.close();
-          for (const y of [0, 1499, 1500, 1583]) {
-            const expected = y < 1500 ? '255,0,0,255' : '0,0,255,255';
-            check([...ctx.getImageData(0, y, 1, 1).data].join(',') === expected, 'Pixel mismatch at row ' + y);
+          const cuts = [[1500, 84], [1500, 100], [844, 56], [864, 58], [1500, 548], [1279, 91], [1279, 77], [719, 41], [1279, 437]];
+          const downloads = new Map(), sources = [];
+          for (const [headHeight, tailHeight] of cuts) {
+            for (const [height, color] of [[headHeight, '#ff0000'], [tailHeight, '#0000ff']]) {
+              const index = sources.length, url = 'https://x1.cmzcdn.org/test-' + index + '.png';
+              downloads.set(url, await source(height, color));
+              sources.push({ index, url, width: 999, height: 999 }); // Intentionally inaccurate reader metadata.
+            }
+          }
+          const originalFetch = globalThis.fetch;
+          globalThis.fetch = async url => {
+            const image = downloads.get(url);
+            if (!image) throw new Error('Unexpected request during offline browser test: ' + url);
+            return new Response(image.bytes, { headers: { 'Content-Type': image.mime } });
+          };
+          let prepared;
+          try { prepared = await preparePages(sources, new AbortController().signal, () => {}); }
+          finally { globalThis.fetch = originalFetch; }
+          check(prepared.pages.length === cuts.length && prepared.layout.ambiguousPairs === 0, 'Dynamic page grouping');
+          check(prepared.layout.groups.every(size => size === 2), 'All main/strip pairs must be learned');
+          let head, parts;
+          for (const page of prepared.pages) {
+            parts = page.parts.map(source => ({ source, image: prepared.files.get(source.index) }));
+            head = parts[0].image;
+            const headHeight = parts[0].source.height, tailHeight = parts[1].source.height;
+            const result = await composePage(parts, new AbortController().signal);
+            check(result.extension === 'png' && result.mime === 'image/png', 'Joined output must be PNG');
+            const image = await createImageBitmap(new Blob([result.bytes], { type: result.mime }));
+            const height = headHeight + tailHeight;
+            check(image.width === 2 && image.height === height, 'Joined output dimensions: ' + height);
+            const canvas = document.createElement('canvas'); canvas.width = 2; canvas.height = height;
+            const ctx = canvas.getContext('2d'); ctx.drawImage(image, 0, 0); image.close();
+            const pixels = ctx.getImageData(0, 0, 2, height).data;
+            for (let y = 0; y < height; y++) {
+              const expected = y < headHeight ? '255,0,0,255' : '0,0,255,255';
+              for (let x = 0; x < 2; x++) {
+                const offset = (y * 2 + x) * 4;
+                check([...pixels.slice(offset, offset + 4)].join(',') === expected, 'Pixel mismatch at row ' + y);
+              }
+            }
           }
           check(await composePage([parts[0]], new AbortController().signal) === head, 'Standalone bytes changed');
           let rejected = false;
@@ -42,7 +69,7 @@ const bundle = await build({
           const controller = new AbortController(); controller.abort(); rejected = false;
           try { await composePage(parts, controller.signal); } catch { rejected = true; }
           check(rejected, 'Cancellation ignored');
-          await fetch('/result', { method: 'POST', body: JSON.stringify({ ok: true, checks: ['PNG encoding', '1584px dimensions', 'pixel order and seam', 'standalone byte preservation', 'dimension mismatch rejection', 'cancellation'] }) });
+          await fetch('/result', { method: 'POST', body: JSON.stringify({ ok: true, checks: ['PNG encoding', 'downloaded image measurements', 'dynamic grouping including unfamiliar sizes', 'every decoded pixel and seam', 'standalone byte preservation', 'dimension mismatch rejection', 'cancellation'] }) });
         } catch (error) { await fetch('/result', { method: 'POST', body: JSON.stringify({ ok: false, error: String(error.stack || error) }) }); }
       })();
     `,

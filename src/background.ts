@@ -3,12 +3,17 @@ import { parseSource } from './comizy';
 import { cdnHeaders } from './headers';
 import { JobStore, updateDownload } from './jobs';
 import { normalizeRoot } from './paths';
-import type { Collection, DownloadJob, Request, SavedFile } from './types';
+import type { DownloadJob, Request, SavedFile } from './types';
 
 const store = new JobStore(browser.storage.local);
 const extensionRoot = browser.runtime.getURL('');
 const helperKey = (id: number) => `helper:${id}`;
-const discoveryRuns = new Map<number, { cancelled: boolean; tabId?: number }>();
+let helperQueue: Promise<unknown> = Promise.resolve();
+function serializeHelpers<T>(action: () => Promise<T>): Promise<T> {
+  const next = helperQueue.then(action);
+  helperQueue = next.catch(() => {});
+  return next;
+}
 
 browser.webRequest.onBeforeSendHeaders.addListener(
   details => cdnHeaders(details, extensionRoot),
@@ -35,9 +40,7 @@ async function closeHelpers(ownerTabId: number): Promise<void> {
 }
 
 async function cancelDiscovery(ownerTabId: number): Promise<void> {
-  const run = discoveryRuns.get(ownerTabId);
-  if (run) run.cancelled = true;
-  await closeHelpers(ownerTabId);
+  await serializeHelpers(() => closeHelpers(ownerTabId));
 }
 
 browser.tabs.onRemoved.addListener(tabId => {
@@ -98,45 +101,23 @@ browser.action.onClicked.addListener(tab => {
   })().catch(console.error).finally(() => { opening = undefined; });
 });
 
-async function discover(url: string, ownerTabId: number): Promise<Collection> {
+async function openDiscovery(url: string, ownerTabId: number): Promise<number> {
   const source = parseSource(url);
-  const previous = discoveryRuns.get(ownerTabId);
-  if (previous) previous.cancelled = true;
-  const run: { cancelled: boolean; tabId?: number } = { cancelled: false };
-  // Register before awaiting anything, so even an immediate cancellation reaches this run.
-  discoveryRuns.set(ownerTabId, run);
-  let id: number | undefined;
-  let success = false;
-  try {
+  return serializeHelpers(async () => {
     await closeHelpers(ownerTabId);
-    if (run.cancelled) throw new Error('Chapter discovery was cancelled.');
+    await browser.tabs.get(ownerTabId);
     const tab = await browser.tabs.create({ url: source.seriesUrl, active: false });
-    id = tab.id!;
-    run.tabId = id;
-    await browser.storage.session.set({ [helperKey(id)]: ownerTabId });
-    if (run.cancelled || !await browser.tabs.get(ownerTabId).then(() => true, () => false)) {
-      run.cancelled = true;
-      throw new Error('Chapter discovery was cancelled.');
-    }
-    for (let attempt = 0; ; attempt++) {
-      try { await browser.tabs.sendMessage(id, { type: 'COLLECTOR_PING' }); break; }
-      catch {
-        if (attempt >= 119) throw new Error('The discovery tab did not load. Open Comizy in Firefox, then retry.');
-        await browser.tabs.get(id); // Closing the helper also cancels discovery promptly.
-        await new Promise(resolve => setTimeout(resolve, 250));
-      }
-    }
-    const collection = await browser.tabs.sendMessage(id, { type: 'COLLECT_SERIES' }) as Collection;
-    success = true;
-    return collection;
-  } finally {
-    if (id !== undefined && (success || run.cancelled)) {
+    const id = tab.id!;
+    try {
+      await browser.storage.session.set({ [helperKey(id)]: ownerTabId });
+      if (!await browser.tabs.get(ownerTabId).then(() => true, () => false)) throw new Error('Chapter discovery was cancelled.');
+      return id;
+    } catch (error) {
       await browser.tabs.remove(id).catch(() => {});
       await browser.storage.session.remove(helperKey(id));
+      throw error;
     }
-    if (discoveryRuns.get(ownerTabId) === run) discoveryRuns.delete(ownerTabId);
-    // On failure leave the page available for inspecting access/login problems.
-  }
+  });
 }
 
 async function reconcile(id: string): Promise<DownloadJob> {
@@ -159,7 +140,7 @@ async function handle(message: Request): Promise<unknown> {
   switch (message.type) {
     case 'REGISTER_MANAGER':
       await browser.storage.session.set({ managerTabId: message.tabId }); return true;
-    case 'DISCOVER': return discover(message.url, message.ownerTabId);
+    case 'OPEN_DISCOVERY': return openDiscovery(message.url, message.ownerTabId);
     case 'CANCEL_DISCOVERY': await cancelDiscovery(message.ownerTabId); return true;
     case 'LIST_JOBS': return store.list();
     case 'GET_JOB': return store.get(message.id);
@@ -222,7 +203,7 @@ async function handle(message: Request): Promise<unknown> {
   }
 }
 
-const requestTypes = new Set(['REGISTER_MANAGER', 'DISCOVER', 'CANCEL_DISCOVERY', 'LIST_JOBS', 'GET_JOB', 'CREATE_JOB', 'CONTROL_JOB', 'PATCH_CHAPTER', 'SAVE_DOWNLOAD', 'RECONCILE']);
+const requestTypes = new Set(['REGISTER_MANAGER', 'OPEN_DISCOVERY', 'CANCEL_DISCOVERY', 'LIST_JOBS', 'GET_JOB', 'CREATE_JOB', 'CONTROL_JOB', 'PATCH_CHAPTER', 'SAVE_DOWNLOAD', 'RECONCILE']);
 browser.runtime.onMessage.addListener((message, sender) => {
   if (sender.id !== browser.runtime.id || !sender.url?.startsWith(extensionRoot) || !requestTypes.has(message?.type)) return;
   return handle(message as Request).then(value => ({ ok: true, value }), error => ({ ok: false, error: errorText(error) }));
